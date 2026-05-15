@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- Documento HTML con Thymeleaf -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Configuración de caracteres -->
+    <meta charset="UTF-8">
+    <!-- Título de la página -->
+    <title>Calculadora</title>
+    <!-- Conexión con el archivo CSS -->
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <!-- Título principal -->
+    <h1>Calculadora MVC</h1>
+
+    <!-- ======================== -->
+    <!-- FORMULARIO -->
+    <!-- ======================== -->
+    <!--
+        th:action -> ruta del controlador
+        th:object -> objeto que se conecta al formulario
+    -->
+    <form th:action="@{/calculadora}"
+          th:object="${form}"
+          method="post">
+
+        <!-- Campo número A -->
+        <label>Número A</label>
+        <input type="number"
+               step="any"
+               th:field="*{numeroA}">
+        <!-- Mostrar error si existe -->
+        <span th:if="${#fields.hasErrors('numeroA')}"
+              th:errors="*{numeroA}"
+              class="error"></span>
+
+        <!-- Campo número B -->
+        <label>Número B</label>
+        <input type="number"
+               step="any"
+               th:field="*{numeroB}">
+        <!-- Mostrar error si existe -->
+        <span th:if="${#fields.hasErrors('numeroB')}"
+              th:errors="*{numeroB}"
+              class="error"></span>
+
+        <!-- Selección de operación -->
+        <label>Operación</label>
+        <select th:field="*{operacion}">
+            <!-- Opción vacía -->
+            <option value="">-- Elige --</option>
+            <!-- Opciones disponibles -->
+            <option value="suma">Suma</option>
+            <option value="resta">Resta</option>
+            <option value="multiplicacion">Multiplicación</option>
+            <option value="division">División</option>
+        </select>
+        <!-- Error de validación -->
+        <span th:if="${#fields.hasErrors('operacion')}"
+              th:errors="*{operacion}"
+              class="error"></span>
+
+        <!-- Botón enviar -->
+        <button type="submit">Calcular</button>
+    </form>
+
+    <!-- ======================== -->
+    <!-- RESULTADO -->
+    <!-- ======================== -->
+    <!-- Solo aparece si existe un resultado -->
+    <div th:if="${resultado}" class="resultado">
+        <!-- Mostrar resultado correcto -->
+        <p th:if="${resultado.error == null}">
+            Resultado:
+            <!-- Mostrar valor calculado -->
+            <strong th:text="${resultado.resultado}"></strong>
+        </p>
+        <!-- Mostrar error -->
+        <p th:if="${resultado.error != null}"
+           class="error"
+           th:text="${resultado.error}"></p>
+    </div>
+
+    <!-- ======================== -->
+    <!-- HISTORIAL -->
+    <!-- ======================== -->
+    <h2>Historial</h2>
+    <!-- Mostrar tabla si hay datos -->
+    <table th:if="${not #lists.isEmpty(historial)}">
+        <!-- Encabezados -->
+        <tr>
+            <th>#</th>
+            <th>A</th>
+            <th>B</th>
+            <th>Operación</th>
+            <th>Resultado</th>
+        </tr>
+        <!-- Recorrer historial -->
+        <tr th:each="op : ${historial}">
+            <!-- Mostrar datos -->
+            <td th:text="${op.id}"></td>
+            <td th:text="${op.numeroA}"></td>
+            <td th:text="${op.numeroB}"></td>
+            <td th:text="${op.tipo}"></td>
+            <!-- Mostrar error o resultado -->
+            <td th:text="${op.error != null ? op.error : op.resultado}"></td>
+        </tr>
+    </table>
+
+    <!-- Mensaje si no hay historial -->
+    <p th:if="${#lists.isEmpty(historial)}">
+        Sin operaciones aún.
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+/* Estilo general de la página */
+body {
+    font-family: sans-serif;    /* Fuente principal */
+    max-width: 600px;           /* Ancho máximo */
+    margin: 40px auto;          /* Centrar contenido */
+    padding: 0 20px;            /* Espacio lateral */
+}
+
+form { /* Estilos del formulario */
+    display: flex;              /* Usa flexbox */
+    flex-direction: column;     /* Elementos en columna */
+    gap: 10px;                  /* Espacio entre elementos */
+    margin-bottom: 24px;        /* Separación inferior */
+}
+
+input,
+select { /* Campos input y select */
+    padding: 8px;               /* Espacio interno */
+    border: 1px solid #ccc;     /* Borde gris */
+    border-radius: 4px;         /* Bordes redondeados */
+    font-size: 14px;            /* Tamaño de texto */
+}
+
+button { /* Botón principal */
+    padding: 10px;              /* Espacio interno */
+    background: #1a66db;        /* Color azul */
+    color: white;               /* Texto blanco */
+    border: none;               /* Sin borde */
+    border-radius: 4px;         /* Bordes redondeados */
+    cursor: pointer;            /* Cursor tipo botón */
+}
+
+.error { /* Mensajes de error */
+    color: #ee2424;             /* Color rojo */
+    font-size: 13px;            /* Texto pequeño */
+}
+
+.resultado { /* Caja del resultado */
+    background: #f0f4f4;        /* Fondo verde claro */
+    border: 1px solid #86efac;  /* Borde verde */
+    padding: 14px;              /* Espaciado interno */
+    border-radius: 6px;         /* Bordes redondeados */
+}
+
+table { /* Tabla del historial */
+    width: 100%;                /* Ocupar todo el ancho */
+    border-collapse: collapse;  /* Unir bordes */
+    margin-top: 10px;           /* Espacio superior */
+}
+
+th,
+td { /* Celdas y encabezados */
+    padding: 8px 12px;          /* Espaciado interno */
+    border-bottom: 1px solid #e5e7eb; /* Línea inferior */
+    text-align: left;           /* Texto alineado a la izquierda */
+    font-size: 13px;            /* Tamaño del texto */
+}
+
+th { /* Encabezados de la tabla */
+    background: #f9fafb;        /* Fondo gris claro */
+    font-weight: 500;           /* Texto seminegrita */
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Declara el motor de plantillas Thymeleaf -->
+<head>
+    <meta charset="UTF-8">
+    <title>Adivina el número</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        h1 { font-size: 24px; margin-bottom: 8px; color: #1e293b; }
+        .subtitulo { font-size: 14px; color: #64748b; margin-bottom: 12px; }
+        label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 6px; }
+        a.link-calc { color: #6366f1; text-decoration: none; font-size: 13px; display: block; margin-top: 16px; }
+        input[type=number] { width: 100%; padding: 10px; font-size: 15px; font-weight: 600; background: #ffffff; border: 2px solid #c7d2fe; border-radius: 8px; outline: none; }
+        button { margin-top: 12px; width: 100%; font-size: 13px; font-weight: 600; background: #6366f1; color: #ffffff; border: none; border-radius: 8px; padding: 10px; cursor: pointer; }
+        button:hover { background: #4f46e5; }
+        .contador { font-size: 13px; color: #6b7280; margin-bottom: 10px; display: block; }
+        .gano      { color: #16a34a; }
+        .perdio    { color: #dc2626; }
+        .caliente  { color: #ea580c; }
+        .tibio     { color: #ca8a04; }
+        .frio      { color: #0ea5e9; }
+        .barra-wrap { background: #e2e8f0; border-radius: 99px; height: 8px; margin-bottom: 16px; overflow: hidden; }
+        .barra { height: 8px; background: #6366f1; border-radius: 99px; transition: width .3s; }
+        .historial h3 { font-size: 13px; color: #64748b; margin-bottom: 8px; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+        .historial ul { list-style: none; }
+        .historial li:last-child { background: #fef9c3; }
+        .btn-reiniciar { background: #0f172a; }
+        .inicio-wrap p { font-size: 15px; color: #475569; margin-bottom: 20px; line-height: 1.6; }
+        .tag { display: inline-block; font-size: 12px; font-weight: 600; color: #6366f1; background: #e0e7ff; padding: 2px 8px; border-radius: 99px; margin-bottom: 12px; }
+        .error-msg { color: #dc2626; font-size: 12px; margin-top: 4px; }
+        .card { background: white; border-radius: 16px; padding: 32px; max-width: 480px; width: 500px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body>
+<div class="card">
+    <span class="tag">Spring Boot MVC</span><!-- Etiqueta visual del proyecto -->
+    <h1>🎯 Adivina el número</h1>
+    <p class="subtitulo">Estoy pensando en un número entre <strong>1</strong> y <strong>100</strong>. ¡Tienes 7 intentos!</p>
+
+    <!-- Se muestra solo si no existe una sesión activa (Pantalla de bienvenida) -->
+    <div th:if="${sesion == null}" class="inicio-wrap">
+        <p class="subtitulo">Las pistas de temperatura te guiarán: 🔥 muy caliente, ♨ caliente, 😐 tibio, 🧊 frío.</p>
+        <!-- Formulario para iniciar el juego llamando a la ruta /juego/nuevo -->
+        <form method="GET" th:action="@{/juego/nuevo}">
+            <button type="submit">▶ Iniciar partida</button>
+        </form>
+    </div>
+
+    <!-- Bloque principal visible cuando existe una sesión activa -->
+    <div th:if="${sesion != null}">
+
+        <!-- Muestra el contador de intentos dinámicamente -->
+        <div class="contador">
+            Intento <strong th:text="${sesion.intentos}"></strong>
+            de <span th:text="${sesion.maxIntentos}"></span>
+        </div>
+
+        <!-- Contenedor de la barra de progreso -->
+        <div class="barra-wrap">
+            <!-- Calcula el ancho de la barra en porcentaje basándose en los intentos realizados -->
+            <div class="barra" th:style="'width: ' + (${sesion.intentos} * 100 / ${sesion.maxIntentos}) + '%'"></div>
+        </div>
+
+        <!-- Si el controlador envió una pista, evaluamos cuál es con un switch -->
+        <div th:if="${pista}">
+            <!-- Caso: Muestra el resultado que devuelve JuegoService -->
+            <div th:switch="${pista}">
+                <p th:case="'GANO'"         class="pista gano">     🎉 ¡Correcto! Era el <span th:text="${intento}"></span></p>
+                <p th:case="'PERDIO'"       class="pista perdio">   💀 ¡Perdiste! Era el <span th:text="${sesion.numeroSecreto}"></span></p>
+                <p th:case="'MUY_CALIENTE'" class="pista caliente"> 🔥 ¡Muy caliente!</p>
+                <p th:case="'CALIENTE'"     class="pista caliente"> ♨️ Caliente.</p>
+                <p th:case="'TIBIO'"        class="pista tibio">    😐 Tibio...</p>
+                <p th:case="'FRIO'"         class="pista frio">     🧊 Frío.</p>
+            </div>
+        </div>
+
+        <!-- Formulario para adivinar: Solo aparece si el juego NO ha terminado -->
+        <form th:if="${not sesion.terminado}"
+              th:action="@{/juego/adivinar}"
+              th:object="${form}"
+              method="post">
+            <label>Tu número (1 - 100):</label>
+            <input type="number" min="1" max="100" th:field="*{numero}" placeholder="Ej: 42">
+            <!-- Muestra mensajes de error si la validación al enviar el formulario falla -->
+            <span th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}" class="error-msg"></span>
+            <button type="submit">Adivinar 🎲</button>
+        </form>
+
+        <!-- Botón para reiniciar: Solo aparece si el juego ya terminó -->
+        <form th:if="${sesion.terminado}" th:action="@{/juego/nuevo}" method="get">
+            <button type="submit" class="btn-reiniciar">🔄 Jugar de nuevo</button>
+        </form>
+
+        <!-- Historial: Se renderiza solo si hay intentos registrados en la lista -->
+        <div th:if="${not #lists.isEmpty(sesion.historialIntentos)}" class="historial">
+            <h3>Historial de intentos</h3>
+            <ul>
+                <!-- Bucle para recorrer cada string en la lista de historial -->
+                <li th:each="h : ${sesion.historialIntentos}" th:text="${h}"></li>
+            </ul>
+        </div>
+
+        <!-- Enlace de navegación hacia el otro controlador (Calculadora) -->
+        <a class="link-calc" th:href="@{/calculadora}">← Volver a la calculadora</a>
+    </div>
+</div>
+</body>
+</html>
